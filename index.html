@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex"><title>Просмотр моделей Базис</title>
+<style>
+:root{--bg:#eef1f4;--pn:#fff;--ink:#17252f;--mut:#667785;--ln:#d5dce2;--ac:#0f6cbd;--on:#fff;--hl:#f5a300;--st:#e4e9ee;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f171d;--pn:#17232b;--ink:#e3eaef;--mut:#8da0ad;--ln:#2a3a46;--ac:#5aa9f0;--on:#08141c;--st:#1b2a34;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#0f171d;--pn:#17232b;--ink:#e3eaef;--mut:#8da0ad;--ln:#2a3a46;--ac:#5aa9f0;--on:#08141c;--st:#1b2a34;color-scheme:dark}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;font:14px/1.45 system-ui,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+[hidden]{display:none!important}
+button,.btn{font:inherit;color:inherit;background:var(--pn);border:1px solid var(--ln);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover,.btn:hover{border-color:var(--ac)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.p{background:var(--ac);border-color:var(--ac);color:var(--on)}
+.btn{display:inline-block}#use{margin:10px 0}
+.mut,small{color:var(--mut)}
+#home{max-width:720px;margin:0 auto;padding:32px 20px}
+h1{font-size:24px;margin:0 0 6px;letter-spacing:-.01em}h2{font-size:16px;margin:28px 0 8px}
+.drop{display:block;border:1.5px dashed var(--ln);border-radius:12px;padding:28px;text-align:center;cursor:pointer;background:var(--pn)}
+.drop:hover,.drop.on{border-color:var(--ac)}
+#ml{list-style:none;margin:8px 0 0;padding:0;border:1px solid var(--ln);border-radius:10px;background:var(--pn)}
+#ml li{display:flex;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid var(--ln);flex-wrap:wrap}#ml li:first-child{border:0}
+#ml .n{flex:1;min-width:140px}#ml b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#err{color:#c0392b;margin-top:12px}
+#app{position:relative;height:100%;overflow:hidden;background:var(--st)}
+canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.top{position:absolute;top:10px;left:10px;right:10px;display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:flex-start;pointer-events:none}.top>*{pointer-events:auto}
+#hd{display:flex;gap:6px;align-items:center;min-width:0;max-width:100%}
+#ttl{font-weight:600;padding:7px 12px;background:var(--pn);border:1px solid var(--ln);border-radius:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar{display:flex;gap:6px;flex-wrap:wrap}.bar button{padding:7px 11px}
+.bar button.on{background:var(--ac);border-color:var(--ac);color:var(--on)}
+.bar #cm.has{background:#d93025;border-color:#d93025;color:#fff}
+#pop,#card{position:absolute;box-sizing:border-box;background:var(--pn);border:1px solid var(--ln);box-shadow:0 8px 28px #0003}
+#pop{top:56px;right:10px;width:min(360px,calc(100% - 20px));max-height:calc(100% - 150px);overflow:auto;border-radius:12px;padding:10px}
+#card{left:10px;bottom:10px;width:min(340px,calc(100% - 20px));border-radius:12px;padding:12px 14px}
+.ph{display:flex;justify-content:space-between;align-items:center}
+.qi,textarea,select{width:100%;box-sizing:border-box;font:inherit;padding:8px 10px;border:1px solid var(--ln);border-radius:8px;background:var(--bg);color:inherit;margin:6px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.r{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:0;background:none;padding:7px 8px;border-radius:6px}.r:hover{background:var(--st)}
+.r b{min-width:2.2em;color:var(--ac)}.r span{flex:1;min-width:0}
+.cm{border-top:1px solid var(--ln);padding:8px 0}
+.lnk{border:0;background:none;padding:0;color:var(--ac);text-decoration:underline;margin-right:10px}
+#card h3{margin:0 28px 6px 0;font-size:15px}
+#card dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0}#card dt{color:var(--mut)}#card dd{margin:0}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.acts button{padding:5px 10px}
+#card .x{position:absolute;top:8px;right:8px;padding:0 8px}
+#msg{position:absolute;left:20px;right:20px;top:45%;text-align:center;color:var(--mut);pointer-events:none}
+@media(max-width:700px){#pop{top:auto;bottom:0;left:0;right:0;width:auto;max-height:60%;border-radius:14px 14px 0 0}#pop:not([hidden])~#card{display:none}}
+</style></head><body>
+<main id="home" hidden>
+<h1>Просмотр моделей Базис-Мебельщика</h1>
+<p class="mut">Откройте файл .fr3d или .b3d с компьютера — он остаётся в вашем браузере. Модели, которые вы отправили боту в Telegram, открываются по ссылке из ответа бота.</p>
+<label class="drop" id="drop"><input type="file" id="f" accept=".fr3d,.b3d" hidden>Выберите файл или перетащите его сюда</label>
+<section id="mgr" hidden><h2>Мои модели</h2>
+<label class="btn p"><input type="file" id="up" accept=".fr3d,.b3d" multiple hidden>Загрузить модель</label>
+<div id="use" class="mut"></div>
+<ul id="ml"></ul></section>
+<div id="err"></div>
+</main>
+<div id="app" hidden>
+<canvas id="cv"></canvas>
+<div class="top"><div id="hd"><button id="back" title="К моделям" hidden>←</button><div id="ttl"></div><button id="isob" hidden></button></div>
+<nav class="bar"><button data-p="s">Поиск</button><button data-p="v">Вид</button><button id="xr">Прозрачный</button><button id="dm" hidden>Размеры</button><button data-p="c" id="cm">Комментарии</button></nav></div>
+<div id="pop" hidden></div><div id="card" hidden></div><div id="msg"></div>
+</div>
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="three.min.js"></script>
+<script src="OrbitControls.js"></script>
+<script src="config.js"></script>
+<script>
+const $=s=>document.querySelector(s),C=window.claude;
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const cap=async n=>{try{return C?await C.use(n):null}catch(e){return null}};
+const b64=a=>{let s='';for(let i=0;i<a.length;i+=32768)s+=String.fromCharCode.apply(null,a.subarray(i,i+32768));return btoa(s)};
+const unb64=t=>{const s=atob(t.trim()),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a.buffer};
+const fmt=n=>n>1e6?(n/1e6).toFixed(1)+' МБ':Math.round(n/1e3)+' КБ';
+const TD=new TextDecoder('utf-16le');
+
+/* ---- разбор контейнера BZ85: словарь имён + дерево узлов, основной блок сжат zlib ---- */
+function dict(S){const n=S.dv.getUint32(S.p,!0);S.p+=4;S.names=[];for(let i=0;i<n;i++){const L=S.dv.getUint32(S.p,!0);S.names.push(String.fromCharCode(...S.u8.subarray(S.p+4,S.p+4+L)));S.p+=4+L}}
+function node(S){const{dv,u8}=S;let p=S.p;const i=dv.getUint32(p,!0),c=dv.getUint32(p+4,!0),k=u8[p+8];p+=9;
+ const o={n:S.names[i]||'',c:[],m:{}};S.p=p;
+ if(k===0){for(let j=0;j<c;j++){const x=node(S);o.c.push(x);if(!(x.n in o.m))o.m[x.n]=x}return o}
+ let v=null;
+ if(k===1)v=!1;else if(k===2)v=!0;else if(k===3){v=u8[p];p++}else if(k===4){v=dv.getUint32(p,!0);p+=4}
+ else if(k===5||k===9){v=dv.getFloat64(p,!0);p+=8}
+ else if(k===6){const L=dv.getUint32(p,!0);v=TD.decode(u8.subarray(p+4,p+4+2*L));p+=4+2*L}
+ else if(k===7){const L=dv.getUint32(p,!0);v=u8.subarray(p+4,p+4+L);p+=4+L}
+ else if(k===8)v=null;else throw Error('Неизвестный тип данных '+k+' — файл новее поддерживаемых версий');
+ S.p=p;o.v=v;return o}
+async function parse(buf){
+ const u8=new Uint8Array(buf);
+ if(String.fromCharCode(...u8.subarray(0,4))!=='BZ85')throw Error('Это не файл Базис-Мебельщика (нет сигнатуры BZ85).');
+ const S={u8,dv:new DataView(buf),p:9};dict(S);const hd=node(S);
+ let d=u8.subarray(S.p+5);
+ if(u8[S.p+4]===1)d=new Uint8Array(await new Response(new Blob([d]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());
+ const T={u8:d,dv:new DataView(d.buffer,d.byteOffset,d.byteLength),p:0};dict(T);const doc=node(T),a=hd.m.Article;doc.title=a?.m.OrderName?.v||a?.m.Name?.v||'';return doc}
+
+/* ---- геометрия: контур = отрезки (16), дуги (18: центр, начало, конец, направление), точки (17) ---- */
+function contour(b){const dv=new DataView(b.buffer,b.byteOffset,b.byteLength),n=dv.getUint32(0,!0),s=[],pts=[];let o=4,ok=!0;
+ for(let i=0;i<n&&o<b.length;i++){const t=b[o],f=k=>dv.getFloat64(o+1+8*k,!0);
+  if(t===16){s.push({a:[f(0),f(1)],b:[f(2),f(3)]});pts.push([f(0),f(1)],[f(2),f(3)]);o+=33}
+  else if(t===18){s.push({c:[f(0),f(1)],a:[f(2),f(3)],b:[f(4),f(5)],cw:b[o+49]===0});pts.push([f(2),f(3)],[f(4),f(5)]);o+=50}
+  else if(t===17){pts.push([f(0),f(1)]);ok=!1;o+=25}
+  else{ok=!1;break}}
+ return pts.length?{s,pts,ok}:null}
+function arc(g){const c=g.c,a1=Math.atan2(g.a[1]-c[1],g.a[0]-c[0]),a2=Math.atan2(g.b[1]-c[1],g.b[0]-c[0]),r=Math.hypot(g.a[0]-c[0],g.a[1]-c[1]),T=Math.PI*2,sg=g.cw?-1:1;
+ const d=((sg*(a2-a1))%T+T)%T||T,k=Math.max(4,Math.ceil(d/.12)),o=[];
+ for(let i=0;i<=k;i++){const t=a1+sg*d*i/k;o.push([c[0]+r*Math.cos(t),c[1]+r*Math.sin(t)])}o[0]=g.a;o[k]=g.b;return o}
+function loops(s){const eq=(p,q)=>Math.abs(p[0]-q[0])<1e-3&&Math.abs(p[1]-q[1])<1e-3,u=s.map(()=>0),L=[],pa=g=>g.c?arc(g):[g.a,g.b];
+ for(let i0=0;i0<s.length;i0++){if(u[i0])continue;u[i0]=1;const g=s[i0],pts=pa(g).slice(0,-1);let cur=g.b;
+  while(!eq(cur,g.a)){let f=-1,rv=!1;for(let i=0;i<s.length&&f<0;i++)if(!u[i]){if(eq(s[i].a,cur))f=i;else if(eq(s[i].b,cur)){f=i;rv=!0}}
+   if(f<0)return null;u[f]=1;let q=pa(s[f]);if(rv)q=q.slice().reverse();pts.push(...q.slice(0,-1));cur=q[q.length-1]}
+  L.push(pts)}return L}
+const area=p=>{let a=0;for(let i=0;i<p.length;i++){const q=p[(i+1)%p.length];a+=p[i][0]*q[1]-q[0]*p[i][1]}return Math.abs(a)/2};
+const hue=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return'hsl('+h%360+',28%,'+(66+h%14)+'%)'};
+
+function tri(b){const dv=new DataView(b.buffer,b.byteOffset,b.byteLength);let o=0;const k=dv.getUint32(o,!0);o+=4;const out=[];
+ for(let i=0;i<k;i++){const L=dv.getUint32(o,!0),name=TD.decode(b.subarray(o+4,o+4+2*L));o+=4+2*L;
+  const M=[];for(let j=0;j<16;j++)M.push(dv.getFloat64(o+8*j,!0));o+=129;const n=dv.getUint32(o,!0);o+=4;
+  const pos=new Float32Array(n*9),nor=new Float32Array(n*9);
+  for(let t=0;t<n;t++){const q=o+112*t;for(let j=0;j<9;j++){pos[t*9+j]=dv.getFloat32(q+4*j,!0);nor[t*9+j]=dv.getFloat32(q+36+4*j,!0)}}
+  o+=112*n;out.push({name,M,pos,nor})}
+ return o===b.length?out:null}
+
+const mcol=n=>/никел|nikel|нержав|хром|chrom|металл|сталь|steel/i.test(n)?'#b9c0c7':/чёрн|черн|black/i.test(n)?'#33373b':/бел|white/i.test(n)?'#f0f0ec':/сер|gr[ae]y/i.test(n)?'#8c9399':'#a4adb5';
+function hw(f,nme){let geo=null;const T=f.m.TriData?.v,g=k=>f.m[k]?.v||0,r=T&&T.length?tri(T):null;
+ if(r&&r.length){const p=[],q=[],c=[];for(const s of r){const k=new THREE.Color(mcol(s.name));for(let i=0;i<s.pos.length;i+=3){p.push(s.pos[i],s.pos[i+1],s.pos[i+2]);q.push(s.nor[i],s.nor[i+1],s.nor[i+2]);c.push(k.r,k.g,k.b)}}
+  geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(p,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(q,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(c,3));geo.userData.vc=1}
+ else{const sz=['X','Y','Z'].map(a=>g('Max'+a)-g('Min'+a)),o=[0,1,2].sort((a,b)=>sz[b]-sz[a]),L=sz[o[0]],d=Math.min(sz[o[1]],sz[o[2]]),ctr=['X','Y','Z'].map(a=>(g('Min'+a)+g('Max'+a))/2);
+  const mm=nme.match(/(\d+(?:[.,]\d+)?)\s*[хx×]\s*(\d+(?:[.,]\d+)?)/i),h=f.m.Holes?.c?.[0]?.m;
+  if(L>=2*Math.max(sz[o[1]],sz[o[2]])&&d>=2){geo=new THREE.CylinderGeometry(d/2,d/2,L,14);if(o[0]===0)geo.rotateZ(Math.PI/2);else if(o[0]===2)geo.rotateX(Math.PI/2);geo.translate(...ctr)}
+  else if(mm&&h){const w=+mm[1].replace(',','.'),l=+mm[2].replace(',','.'),dv=new THREE.Vector3(h.DirX?.v||0,h.DirY?.v||0,h.DirZ?.v||0);
+   if(dv.lengthSq()>0){geo=new THREE.CylinderGeometry(w/2,w/2,l,12);geo.translate(0,l/2,0);geo.applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),dv.normalize())));geo.translate(h.X?.v||0,h.Y?.v||0,h.Z?.v||0)}}
+  else if(L>=10)geo=new THREE.BoxGeometry(sz[0]||1,sz[1]||1,sz[2]||1).translate(...ctr)}
+ if(geo){geo.computeBoundingBox();const s=geo.boundingBox.getSize(new THREE.Vector3());geo.userData.dims=[s.x,s.y,s.z].sort((a,b)=>b-a)}
+ return geo}
+
+/* ---- сцена ---- */
+let R,scene,cam,ctl,dirty=1,root,P=[],BL=[],D=[],S={xray:0,dm:1,iso:null,sel:null},canBack=!1,usr,assets,db,canEdit=!1,mid=null,CM=[],cu,uid=null,pop='',CL=null,unsub;
+const flash=t=>{$('#msg').textContent=t;setTimeout(()=>$('#msg').textContent='',4500)};
+function shape(c){const L=c.ok&&loops(c.s);if(!L)return null;L.sort((a,b)=>area(b)-area(a));
+ const V=p=>p.map(a=>new THREE.Vector2(a[0],a[1])),sh=new THREE.Shape(V(L[0]));L.slice(1).forEach(h=>sh.holes.push(new THREE.Path(V(h))));return sh}
+function init(){if(R)return;
+ R=new THREE.WebGLRenderer({canvas:$('#cv'),antialias:!0,alpha:!0});R.setPixelRatio(Math.min(devicePixelRatio,2));
+ scene=new THREE.Scene();cam=new THREE.PerspectiveCamera(40,1,1,1e5);
+ scene.add(new THREE.HemisphereLight(0xffffff,0x8899aa,.95));const dl=new THREE.DirectionalLight(0xffffff,.7);dl.position.set(1,2,1.5);scene.add(dl);
+ ctl=new THREE.OrbitControls(cam,R.domElement);ctl.addEventListener('change',()=>dirty=1);
+ new ResizeObserver(()=>{const s=$('#app');R.setSize(s.clientWidth,s.clientHeight,!1);cam.aspect=s.clientWidth/s.clientHeight;cam.updateProjectionMatrix();dirty=1}).observe($('#app'));
+ (function loop(){requestAnimationFrame(loop);if(dirty){dirty=0;R.render(scene,cam)}})();
+ let d0;R.domElement.addEventListener('pointerdown',e=>d0=[e.clientX,e.clientY]);
+ R.domElement.addEventListener('pointerup',e=>{if(d0&&Math.hypot(e.clientX-d0[0],e.clientY-d0[1])<6)pick(e)})}
+function label(t){const c=document.createElement('canvas');c.width=160;c.height=64;const x=c.getContext('2d');x.fillStyle='rgba(255,255,255,.9)';x.fillRect(0,0,160,64);
+ x.fillStyle='#17252f';x.font='bold 40px system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(t,80,34);
+ const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:!1}));s.renderOrder=9;return s}
+function build(doc){
+ if(root){scene.remove(root);root.traverse(o=>o.geometry&&o.geometry.dispose())}
+ const fl={};for(const f of(doc.m.FurnList?.c||[]))fl[f.m.FastID?.v]=f;
+ root=new THREE.Group();P=[];BL=[];D=[];let n=0;const top={id:0,n:'Модель',a:'',up:null};
+ const lm=new THREE.LineBasicMaterial({color:0x2c3b47,transparent:!0,opacity:.5}),HG={};
+ const place=(o,src)=>{const T=src.m.Trans;if(!T)return;const g=k=>T.m[k]?T.m[k].v:0;o.position.set(g('X'),g('Y'),g('Z'));o.quaternion.set(g('Rx'),g('Ry'),g('Rz'),g('Rw')).normalize()};
+ const add=(p,mesh,o,par,bl)=>{p.id=P.length;p.bl=bl;p.mesh=mesh;p.chain=new Set();for(let b=bl;b;b=b.up)p.chain.add(b.id);mesh.userData.p=p;place(mesh,o);par.add(mesh);P.push(p)};
+ const dim=(o,par)=>{const g=k=>o.m[k]?o.m[k].v:0,L=g('Size'),H=g('Length'),c=g('Color'),grp=new THREE.Group();place(grp,o);
+  const ln=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([[0,0],[0,H],[L,0],[L,H],[0,H],[L,H]].map(a=>new THREE.Vector3(a[0],a[1],0))),new THREE.LineBasicMaterial({color:'rgb('+[c&255,c>>8&255,c>>16&255]+')',depthTest:!1}));
+  ln.renderOrder=8;const sp=label(String(Math.round(g('Value')||L)));sp.position.set(L/2,H,0);grp.add(ln,sp);par.add(grp);D.push(grp)};
+ const walk=(o,par,bl,path)=>{const m=o.m,t=m.Type?.v,nm=m.Name?.v||'';
+  if(m.Objs){const g=new THREE.Group();place(g,o);par.add(g);const b={id:++n,n:nm,a:m.ArtPos?.v||'',up:bl};BL.push(b);m.Objs.c.forEach(c=>walk(c,g,b,[...path,nm]));return}
+  if((t===4002||t===2004)&&m.Contour){const c=contour(m.Contour.v);if(!c)return;const T=m.Thick?.v??m.Thickness?.v??18,th=Math.abs(T)||1;
+   const xs=c.pts.map(a=>a[0]),ys=c.pts.map(a=>a[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+   const sh=shape(c)||new THREE.Shape([[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(a=>new THREE.Vector2(a[0],a[1])));
+   const geo=new THREE.ExtrudeGeometry(sh,{depth:th,bevelEnabled:!1});if(T<0)geo.translate(0,0,-th);geo.computeBoundingBox();const bb=geo.boundingBox;
+   const [mat,art]=(m.Mat?.v||'').split('\r'),color=hue(mat||nm),bt={};
+   for(const b of(m.Butts?.c||[])){const k=(b.m.Mat?.v||'Кромка')+(b.m.Sign?' ('+b.m.Sign.v+')':'');bt[k]=(bt[k]||0)+1}
+   const mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color,polygonOffset:!0,polygonOffsetFactor:1,polygonOffsetUnits:1}));mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo,30),lm));
+   const d=[bb.max.x-bb.min.x,bb.max.y-bb.min.y].sort((a,b)=>b-a).concat(th);
+   add({k:'p',pos:m.ArtPos?.v||'',name:nm,mat:mat||'',art:art||'',dims:d,color,ckey:[nm,mat,...d.map(Math.round)].join('|'),
+    edge:Object.entries(bt).map(([k,v])=>k+' — '+v+' стор.').join('; ')},mesh,o,par,bl)}
+  else if(t===3001){const f=fl[m.FastID?.v];if(!f)return;const nme=(f.m.Name?.v||nm).split('\r')[0];if(/^Отверстие/i.test(nme))return;
+   const id=m.FastID.v;if(!(id in HG))HG[id]=hw(f,nme);const geo=HG[id];if(!geo)return;const vc=!!geo.userData.vc,col=vc?'#ffffff':'#aab4bd';
+   add({k:'h',pos:'',name:nme,mat:'',art:'',dims:geo.userData.dims,color:col,ckey:nme,edge:''},new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:col,vertexColors:vc,side:THREE.DoubleSide,roughness:.5,metalness:.25})),o,par,bl)}
+  else if(t===9000)dim(o,par)};
+ (doc.m.Model?.c||[]).forEach(o=>{if(o.n==='Obj')walk(o,root,top,[])});
+ scene.add(root);scene.updateMatrixWorld(!0);S={xray:0,dm:1,iso:null,sel:null};$('#dm').hidden=!D.length;
+ const h=Math.max(vbox().getSize(new THREE.Vector3()).length()*.03,25);D.forEach(g=>g.traverse(x=>x.isSprite&&x.scale.set(h*2.5,h,1)));
+ cam.position.set(.7,.5,1);ctl.target.set(0,0,0);refresh();fit(vbox());card(null)}
+const vbox=()=>{const b=new THREE.Box3();P.forEach(p=>p.mesh.visible&&b.expandByObject(p.mesh));return b.isEmpty()?new THREE.Box3(new THREE.Vector3(-500,-500,-500),new THREE.Vector3(500,500,500)):b};
+function fit(box,k=1.4){const c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3()),r=Math.max(s.x,s.y,s.z,60),d=r*k/(2*Math.tan(cam.fov*Math.PI/360));
+ const dir=cam.position.clone().sub(ctl.target).normalize();ctl.target.copy(c);cam.position.copy(c).addScaledVector(dir,d);cam.near=d/100;cam.far=d*30;cam.updateProjectionMatrix();ctl.update();dirty=1}
+function refresh(){for(const p of P){const sel=p===S.sel,g=S.xray&&!sel,m=p.mesh,t=m.material;
+  m.visible=!S.iso||p.chain.has(S.iso.id);t.transparent=g;t.opacity=g?.16:1;t.depthWrite=!g;t.color.set(sel?'#f5a300':p.color)}
+ D.forEach(x=>x.visible=!!S.dm);$('#xr').classList.toggle('on',!!S.xray);$('#dm').classList.toggle('on',!!S.dm);
+ $('#isob').hidden=!S.iso;$('#isob').textContent=S.iso?'Блок «'+S.iso.n+'» ✕':'';dirty=1}
+function pick(e){const r=R.domElement.getBoundingClientRect(),rc=new THREE.Raycaster();
+ rc.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),cam);
+ const h=rc.intersectObjects(P.filter(p=>p.mesh.visible).map(p=>p.mesh),!1)[0];sel(h?h.object.userData.p:null)}
+function sel(p){S.sel=p;refresh();card(p)}
+function focus(p){fit(new THREE.Box3().expandByObject(p.mesh),p.k==='h'?8:2.4)}
+function iso(b){S.iso=b&&S.iso!==b?b:null;refresh();fit(vbox())}
+
+/* ---- интерфейс ---- */
+function card(p){const c=$('#card');c.hidden=!p;if(!p)return;c.textContent='';
+ c.append(el('h3','',(p.pos?'Поз. '+p.pos+' — ':'')+p.name));
+ const dl=el('dl'),add=(k,v)=>{if(v)dl.append(el('dt','',k),el('dd','',v))};
+ add('Материал',p.mat);add('Артикул',p.art);add('Размер, мм',p.dims.map(x=>+x.toFixed(1)).join(' × '));add('Кромка',p.edge);add('Блок',p.bl.id?p.bl.n:'');
+ const n=P.filter(q=>q.ckey===p.ckey).length;add('Таких деталей',n>1?n+' шт.':'');
+ const x=el('button','x','✕');x.title='Закрыть';x.onclick=()=>sel(null);const ac=el('div','acts');
+ if(p.bl.id){const b=el('button','',S.iso===p.bl?'Показать всё':'Только этот блок');b.onclick=()=>{iso(p.bl);card(p)};ac.append(b)}
+ if(mid&&db){const k=el('button','','Комментарий');k.onclick=()=>openPop('c');ac.append(k)}
+ c.append(dl,ac,x)}
+const row=p=>{const r=el('button','r');r.append(el('b','',p.pos||'—'),el('span','',p.name),el('small','',p.dims.map(Math.round).join('×')));r.onclick=()=>{closePop();sel(p);focus(p)};return r};
+function openPop(k){const p=$('#pop');if(pop===k){closePop();return}pop=k;p.hidden=!1;p.textContent='';
+ const h=el('div','ph'),x=el('button','','✕');x.onclick=closePop;h.append(el('b','',{s:'Поиск детали',v:'Вид',c:'Комментарии'}[k]),x);
+ p.append(h,k==='s'?popSearch():k==='v'?popViews():popComments());
+ document.querySelectorAll('.bar [data-p]').forEach(b=>b.classList.toggle('on',b.dataset.p===k))}
+function closePop(){pop='';CL=null;$('#pop').hidden=!0;document.querySelectorAll('.bar [data-p]').forEach(b=>b.classList.remove('on'))}
+function popSearch(){const w=el('div'),i=el('input'),L=el('div');i.type='search';i.className='qi';i.placeholder='№ позиции или название';w.append(i,L);
+ const go=()=>{L.textContent='';const q=i.value.trim().toLowerCase();if(!q){L.append(el('p','mut','Введите номер позиции или часть названия детали или блока.'));return}
+  BL.filter(b=>(b.a+' '+b.n).toLowerCase().includes(q)).slice(0,20).forEach(b=>{const r=el('button','r');r.append(el('b','','▣'),el('span','','Блок: '+(b.a?b.a+' ':'')+b.n));r.onclick=()=>{closePop();iso(b)};L.append(r)});
+  P.filter(p=>p.pos.toLowerCase().startsWith(q)||(p.name+' '+p.mat).toLowerCase().includes(q))
+   .sort((a,b)=>(b.pos.toLowerCase()===q)-(a.pos.toLowerCase()===q)||a.pos.localeCompare(b.pos,'ru',{numeric:!0})).slice(0,100).forEach(p=>L.append(row(p)));
+  if(!L.children.length)L.append(el('p','mut','Ничего не найдено.'))};
+ i.oninput=go;i.onkeydown=e=>{if(e.key==='Enter'){const r=L.querySelector('.r');r&&r.click()}};go();setTimeout(()=>i.focus(),50);return w}
+const VW=[['Спереди',0,0,1],['Сзади',0,0,-1],['Слева',-1,0,0],['Справа',1,0,0],['Сверху',0,1,.001],['Снизу',0,-1,.001],['Изометрия',.7,.5,1]];
+function popViews(){const g=el('div','grid');VW.forEach(v=>{const b=el('button','',v[0]);b.onclick=()=>{cam.position.copy(ctl.target).add(new THREE.Vector3(v[1],v[2],v[3]));fit(vbox());closePop()};g.append(b)});return g}
+function popComments(){const w=el('div');
+ if(!mid||!db){w.append(el('p','mut',!mid?'Комментарии работают для моделей из кабинета, а не для локальных файлов.':'Чтобы читать и писать комментарии, войдите в аккаунт.'));return w}
+ const L=el('div'),ta=el('textarea'),sl=el('select'),go=el('button','p','Добавить'),opts=[['m','Модель']];
+ if(S.sel)opts.push(['p'+S.sel.id,(S.sel.pos?'Поз. '+S.sel.pos+' ':'')+S.sel.name]);const bk=S.sel?S.sel.bl:S.iso;if(bk&&bk.id)opts.push(['b'+bk.id,'Блок: '+bk.n]);
+ opts.forEach(o=>{const e=el('option','',o[1]);e.value=o[0];sl.append(e)});sl.value=opts[opts.length>1?1:0][0];
+ ta.placeholder=canEdit?'Комментарий автора модели…':'Ваш комментарий…';ta.rows=3;
+ CL=()=>{L.textContent='';if(!CM.length)L.append(el('p','mut','Комментариев пока нет.'));
+  CM.forEach(c=>{const d=el('div','cm'),t=el('button','lnk',c.l||'Модель');
+   t.onclick=()=>{closePop();const k=c.t[0],i=+c.t.slice(1);if(k==='p'&&P[i]){sel(P[i]);focus(P[i])}else if(k==='b'){const b=BL.find(x=>x.id===i);b&&iso(b)}};
+   d.append(el('b','',c.a?'Автор модели':'Гость'),el('small','','  '+new Date(c.ts).toLocaleString('ru',{dateStyle:'short',timeStyle:'short'})),el('br'),t,el('div','',c.x));
+   if(canEdit||(uid&&c.u===uid)){const x=el('button','lnk','Удалить');x.onclick=()=>db.doc('comments/'+c.id).delete().catch(e=>flash('Не удалось удалить: '+(e.message||e.code)));d.append(x)}
+   L.append(d)})};
+ go.onclick=async()=>{const x=ta.value.trim();if(!x)return;const o=opts.find(a=>a[0]===sl.value);go.disabled=!0;
+  try{await db.collection('comments').add({m:mid,t:o[0],l:o[1],x,a:canEdit,u:uid,ts:Date.now()});ta.value=''}catch(e){flash('Не удалось отправить (в прототипе писать могут только участники с правом взаимодействия): '+(e.message||e.code))}go.disabled=!1};
+ CL();w.append(L,sl,ta,go);return w}
+function subComments(){cu&&cu();cu=null;CM=[];const b=$('#cm');b.classList.remove('has');b.textContent='Комментарии';if(!mid||!db)return;
+ cu=db.collection('comments').where('m','==',mid).onSnapshot(s=>{CM=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);
+  b.classList.toggle('has',CM.length>0);b.textContent='Комментарии'+(CM.length?' ('+CM.length+')':'');CL&&pop==='c'&&CL()},()=>{})}
+document.querySelectorAll('.bar [data-p]').forEach(b=>b.onclick=()=>openPop(b.dataset.p));
+$('#xr').onclick=()=>{S.xray=S.xray?0:1;refresh()};
+$('#dm').onclick=()=>{S.dm=S.dm?0:1;refresh()};
+$('#isob').onclick=()=>iso(null);
+$('#back').onclick=()=>home();
+addEventListener('keydown',e=>e.key==='Escape'&&closePop());
+
+async function show(buf,back,name,id){
+ $('#home').hidden=!0;$('#app').hidden=!1;$('#back').hidden=!back;$('#msg').textContent='Читаю модель…';closePop();
+ try{const doc=await parse(buf);init();mid=id||null;const t=doc.title||(name||'').replace(/\.[^.]+$/,'')||'Модель';$('#ttl').textContent=t;document.title=t;
+  build(doc);$('#msg').textContent=P.length?'':'В файле не нашлось деталей для показа.';subComments()}
+ catch(e){$('#app').hidden=!0;home(e.message)}}
+async function localFile(f){if(f){canBack=!0;await show(await f.arrayBuffer(),!0,f.name,null)}}
+$('#f').onchange=e=>localFile(e.target.files[0]);
+addEventListener('dragover',e=>e.preventDefault());addEventListener('drop',e=>{e.preventDefault();localFile(e.dataTransfer.files[0])});
+
+const meter=()=>assets.list().then(r=>{$('#use').textContent='Занято '+fmt(r.usage.bytes)+' из '+fmt(r.usage.maxBytes)},()=>{});
+function home(err){closePop();$('#app').hidden=!0;$('#home').hidden=!1;$('#err').textContent=err||'';
+ if(!(assets&&db&&canEdit))return;$('#mgr').hidden=!1;if(unsub)return;
+ unsub=db.collection('models').orderBy('ts','desc').onSnapshot(s=>{const u=$('#ml');u.textContent='';meter();
+  if(s.empty)u.append(el('li','mut','Пока нет моделей. Загрузите первую.'));
+  s.docs.forEach(d=>{const m=d.data(),li=el('li'),n=el('div','n'),nm=m.title||m.name;n.append(el('b','',nm),el('small','',(m.file?m.file+', ':'')+fmt(m.size)+', '+new Date(m.ts).toLocaleDateString('ru')));
+   const o=el('button','','Открыть'),c=el('button','','Ссылка'),x=el('button','','Удалить');
+   o.onclick=()=>{canBack=!0;openId(d.id)};
+   c.onclick=()=>{const url=location.href.split('#')[0]+'#'+d.id;let i=li.querySelector('input');
+    if(!i){i=el('input');i.readOnly=!0;i.style.cssText='flex-basis:100%;font:inherit;padding:6px 8px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);color:inherit';li.append(i)}
+    i.value=url;i.focus();i.select();navigator.clipboard?.writeText(url).then(()=>{c.textContent='Скопировано'},()=>{});setTimeout(()=>c.textContent='Ссылка',1800)};
+   x.onclick=async()=>{if(!x.dataset.s){x.dataset.s=1;x.textContent='Точно удалить?';x.style.cssText='background:#d93025;border-color:#d93025;color:#fff';
+     setTimeout(()=>{delete x.dataset.s;x.textContent='Удалить';x.style.cssText=''},3500);return}
+    x.disabled=!0;x.textContent='Удаляю…';let w='';
+    try{try{await assets.delete(d.id)}catch(e){w=' Файл в хранилище не удалён: '+(e.message||e.code)}
+     await db.doc('models/'+d.id).delete();const q=await db.collection('comments').where('m','==',d.id).get();q.docs.forEach(k=>db.doc('comments/'+k.id).delete());if(w)$('#err').textContent='Запись «'+nm+'» удалена.'+w}
+    catch(e){x.disabled=!1;x.textContent='Удалить';x.style.cssText='';$('#err').textContent='Не удалось удалить «'+nm+'»: '+(e.message||e.code||e)}};
+   li.append(n,o,c,x);u.append(li)})},e=>$('#err').textContent='Список моделей недоступен: '+(e.message||e.code))}
+$('#up').onchange=async e=>{$('#err').textContent='';
+ for(const f of e.target.files){try{const buf=await f.arrayBuffer(),doc=await parse(buf);
+  const r=await assets.upload(new Blob([encodeURIComponent(f.name)+'\n'+b64(new Uint8Array(buf))],{type:'text/plain'}));
+  await db.collection('models').doc(r.id).set({title:doc.title||f.name.replace(/\.[^.]+$/,''),file:f.name,size:f.size,ts:Date.now()})}
+  catch(x){$('#err').textContent='Не удалось загрузить «'+f.name+'»: '+(x.message||x.code)}}e.target.value=''};
+const TGW=()=>window.Telegram&&window.Telegram.WebApp;
+const inTelegram=()=>/tgWebApp/.test(location.hash)||!!window.TelegramWebviewProxy;
+const waitSDK=async()=>{if(!inTelegram())return;for(let i=0;i<30&&!TGW();i++)await new Promise(r=>setTimeout(r,50))};
+const startParam=()=>{let s='';try{s=TGW()&&TGW().initDataUnsafe&&TGW().initDataUnsafe.start_param||''}catch(e){}
+ if(!s){const m=/[#&?]tgWebAppStartParam=([^&]+)/.exec(location.hash+location.search);if(m)try{s=decodeURIComponent(m[1])}catch(e){}}return s};
+const FID=/^[A-Za-z0-9_-]{20,250}$/;
+async function openTg(fid,name){
+ const W=((window.BAZIS||{}).worker||'').replace(/\/+$/,'');
+ try{
+  if(!W||/ВАШ|YOUR/i.test(W))throw Error('В файле config.js не указан адрес Worker.');
+  let r;try{r=await fetch(W+'/f/'+fid)}catch(e){throw Error('Не удалось связаться с сервером моделей. Проверьте интернет и повторите.')}
+  if(r.status===404)throw Error('Модель не найдена в Telegram: ссылка неверная или файл удалён.');
+  if(r.status===413)throw Error('Файл больше 20 МБ: Telegram не отдаёт такие файлы ботам.');
+  if(!r.ok)throw Error('Сервер моделей ответил ошибкой '+r.status+'.');
+  await show(await r.arrayBuffer(),canBack,name,null)
+ }catch(e){home(e.message)}}
+(async()=>{
+ $('#cm').hidden=!0;
+ await waitSDK();
+ try{const w=TGW();if(w){w.ready();w.expand()}}catch(e){}
+ const q=new URLSearchParams(location.search),f=q.get('f')||startParam();
+ if(f&&FID.test(f)){$('#app').hidden=!1;$('#msg').textContent='Загружаю модель…';openTg(f,q.get('n')||'')}
+ else home(f?'Некорректная ссылка на модель.':'')})();
+</script></body></html>
