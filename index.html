@@ -21,6 +21,7 @@ h1{font-size:24px;margin:0 0 6px;letter-spacing:-.01em}h2{font-size:16px;margin:
 .drop:hover,.drop.on{border-color:var(--ac)}
 #ml{list-style:none;margin:8px 0 0;padding:0;border:1px solid var(--ln);border-radius:10px;background:var(--pn)}
 #ml li{display:flex;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid var(--ln);flex-wrap:wrap}#ml li:first-child{border:0}
+#ol{list-style:none;margin:12px 0 0;padding:0;border:1px solid var(--ln);border-radius:10px;background:var(--pn);overflow:hidden}#ol li{border-top:1px solid var(--ln)}#ol li:first-child{border:0}#ol li.mut{padding:12px}#ol button{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px;border:0;border-radius:0;background:none;color:inherit;font:inherit;cursor:pointer}#ol button:hover{background:rgba(127,127,127,.12)}#ol span{overflow:hidden;text-overflow:ellipsis;word-break:break-word}#ol small{white-space:nowrap}
 #ml .n{flex:1;min-width:140px}#ml b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #err{color:#c0392b;margin-top:12px}
 #app{position:relative;height:100%;overflow:hidden;background:var(--st)}
@@ -49,8 +50,9 @@ canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 @media(max-width:700px){#pop{top:auto;bottom:0;left:0;right:0;width:auto;max-height:60%;border-radius:14px 14px 0 0}#pop:not([hidden])~#card{display:none}}
 </style></head><body>
 <main id="home" hidden>
-<h1>Просмотр моделей Базис-Мебельщика</h1>
-<p class="mut">Откройте файл .fr3d или .b3d с компьютера — он остаётся в вашем браузере. Модели, которые вы отправили боту в Telegram, открываются по ссылке из ответа бота.</p>
+<h1 id="h1">Просмотр моделей Базис-Мебельщика</h1>
+<p class="mut" id="intro">Откройте файл .fr3d или .b3d с компьютера — он остаётся в вашем браузере. Модели заказов открываются по ссылке, которую даёт бот в Telegram.</p>
+<ul id="ol" hidden></ul>
 <label class="drop" id="drop"><input type="file" id="f" accept=".fr3d,.b3d" hidden>Выберите файл или перетащите его сюда</label>
 <section id="mgr" hidden><h2>Мои модели</h2>
 <label class="btn p"><input type="file" id="up" accept=".fr3d,.b3d" multiple hidden>Загрузить модель</label>
@@ -258,7 +260,7 @@ $('#f').onchange=e=>localFile(e.target.files[0]);
 addEventListener('dragover',e=>e.preventDefault());addEventListener('drop',e=>{e.preventDefault();localFile(e.dataTransfer.files[0])});
 
 const meter=()=>assets.list().then(r=>{$('#use').textContent='Занято '+fmt(r.usage.bytes)+' из '+fmt(r.usage.maxBytes)},()=>{});
-function home(err){closePop();$('#app').hidden=!0;$('#home').hidden=!1;$('#err').textContent=err||'';
+function home(err){closePop();$('#app').hidden=!0;$('#home').hidden=!1;$('#err').textContent=err||'';renderOrder();
  if(!(assets&&db&&canEdit))return;$('#mgr').hidden=!1;if(unsub)return;
  unsub=db.collection('models').orderBy('ts','desc').onSnapshot(s=>{const u=$('#ml');u.textContent='';meter();
   if(s.empty)u.append(el('li','mut','Пока нет моделей. Загрузите первую.'));
@@ -285,22 +287,42 @@ const inTelegram=()=>/tgWebApp/.test(location.hash)||!!window.TelegramWebviewPro
 const waitSDK=async()=>{if(!inTelegram())return;for(let i=0;i<30&&!TGW();i++)await new Promise(r=>setTimeout(r,50))};
 const startParam=()=>{let s='';try{s=TGW()&&TGW().initDataUnsafe&&TGW().initDataUnsafe.start_param||''}catch(e){}
  if(!s){const m=/[#&?]tgWebAppStartParam=([^&]+)/.exec(location.hash+location.search);if(m)try{s=decodeURIComponent(m[1])}catch(e){}}return s};
-const FID=/^[A-Za-z0-9_-]{20,250}$/;
-async function openTg(fid,name){
- const W=((window.BAZIS||{}).worker||'').replace(/\/+$/,'');
- try{
-  if(!W||/ВАШ|YOUR/i.test(W))throw Error('В файле config.js не указан адрес Worker.');
-  let r;try{r=await fetch(W+'/f/'+fid)}catch(e){throw Error('Не удалось связаться с сервером моделей. Проверьте интернет и повторите.')}
-  if(r.status===404)throw Error('Модель не найдена в Telegram: ссылка неверная или файл удалён.');
-  if(r.status===413)throw Error('Файл больше 20 МБ: Telegram не отдаёт такие файлы ботам.');
-  if(!r.ok)throw Error('Сервер моделей ответил ошибкой '+r.status+'.');
-  await show(await r.arrayBuffer(),canBack,name,null)
- }catch(e){home(e.message)}}
+const OID=/^[0-9a-f]{16}$/;
+let ORDER=null;
+async function wfetch(path,manifest){
+ const w=((window.BAZIS||{}).worker||'').replace(/\/+$/,'');
+ if(!w||/ВАШ|YOUR/i.test(w))throw Error('В файле config.js не указан адрес Worker.');
+ let r;try{r=await fetch(w+path)}catch(e){throw Error('Не удалось связаться с сервером моделей. Проверьте интернет и повторите.')}
+ if(!r.ok){let m='';try{m=(await r.json()).error||''}catch(e){}
+  if(r.status===404&&manifest)throw Error('Просмотр не найден: ссылка неверная или его удалили.');
+  throw Error((m||'Сервер моделей ответил ошибкой '+r.status)+'.')}
+ return r}
+function renderOrder(){
+ const ol=$('#ol');ol.textContent='';
+ $('#h1').textContent=ORDER?ORDER.title:'Просмотр моделей Базис-Мебельщика';
+ $('#drop').hidden=!!ORDER;$('#intro').hidden=!!ORDER;ol.hidden=!ORDER;
+ if(!ORDER)return;
+ document.title=ORDER.title;
+ if(!ORDER.files.length){ol.append(el('li','mut','В этом заказе нет файлов моделей.'));return}
+ ORDER.files.forEach((f,i)=>{const li=el('li'),bt=el('button','');
+  bt.append(el('span','',f.n),el('small','mut',f.z?(f.z>=1e6?(f.z/1e6).toFixed(1)+' МБ':Math.max(1,Math.round(f.z/1e3))+' КБ'):''));
+  bt.onclick=()=>{canBack=!0;openFile(i)};li.append(bt);ol.append(li)})}
+async function openFile(i){
+ const f=ORDER.files[i];
+ $('#home').hidden=!0;$('#app').hidden=!1;$('#back').hidden=!canBack;$('#ttl').textContent=ORDER.title;$('#msg').textContent='Загружаю модель…';
+ try{const r=await wfetch('/o/'+ORDER.id+'/'+i);await show(await r.arrayBuffer(),canBack,f.n.split('/').pop(),null)}
+ catch(e){home(e.message)}}
 (async()=>{
  $('#cm').hidden=!0;
  await waitSDK();
  try{const w=TGW();if(w){w.ready();w.expand()}}catch(e){}
- const q=new URLSearchParams(location.search),f=q.get('f')||startParam();
- if(f&&FID.test(f)){$('#app').hidden=!1;$('#msg').textContent='Загружаю модель…';openTg(f,q.get('n')||'')}
- else home(f?'Некорректная ссылка на модель.':'')})();
+ const q=new URLSearchParams(location.search),o=q.get('o')||startParam();
+ if(!o){home();return}
+ if(!OID.test(o)){home('Некорректная ссылка на просмотр.');return}
+ $('#app').hidden=!1;$('#msg').textContent='Загружаю…';
+ try{
+  const m=await(await wfetch('/o/'+o,!0)).json();
+  ORDER={id:o,title:m.title||'Модель',files:m.files||[]};
+  if(ORDER.files.length===1){canBack=!1;await openFile(0)}else home()
+ }catch(e){home(e.message)}})();
 </script></body></html>
