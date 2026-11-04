@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Просмотр моделей Базис</title>
+<meta name="robots" content="noindex"><title>Просмотр моделей Базис</title>
 <style>
 :root{--bg:#eef1f4;--pn:#fff;--ink:#17252f;--mut:#667785;--ln:#d5dce2;--ac:#0f6cbd;--on:#fff;--hl:#f5a300;--st:#e4e9ee;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f171d;--pn:#17232b;--ink:#e3eaef;--mut:#8da0ad;--ln:#2a3a46;--ac:#5aa9f0;--on:#08141c;--st:#1b2a34;color-scheme:dark}}
@@ -21,6 +21,7 @@ h1{font-size:24px;margin:0 0 6px;letter-spacing:-.01em}h2{font-size:16px;margin:
 .drop:hover,.drop.on{border-color:var(--ac)}
 #ml{list-style:none;margin:8px 0 0;padding:0;border:1px solid var(--ln);border-radius:10px;background:var(--pn)}
 #ml li{display:flex;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid var(--ln);flex-wrap:wrap}#ml li:first-child{border:0}
+#ol{list-style:none;margin:12px 0 0;padding:0;border:1px solid var(--ln);border-radius:10px;background:var(--pn);overflow:hidden}#ol li{border-top:1px solid var(--ln)}#ol li:first-child{border:0}#ol li.mut{padding:12px}#ol button{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px;border:0;border-radius:0;background:none;color:inherit;font:inherit;cursor:pointer}#ol button:hover{background:rgba(127,127,127,.12)}#ol span{overflow:hidden;text-overflow:ellipsis;word-break:break-word}#ol small{white-space:nowrap}
 #ml .n{flex:1;min-width:140px}#ml b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #err{color:#c0392b;margin-top:12px}
 #app{position:relative;height:100%;overflow:hidden;background:var(--st)}
@@ -79,8 +80,6 @@ canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
  #pop,#card{position:relative;order:2;top:auto;left:auto;right:auto;bottom:auto;width:auto;max-height:42vh;overflow:auto;border-radius:0;border-width:1px 0 0;box-shadow:none}
  #card{max-height:38vh}
 }
-
-#ol{list-style:none;margin:12px 0 0;padding:0;border:1px solid var(--ln);border-radius:10px;background:var(--pn);overflow:hidden}#ol li{border-top:1px solid var(--ln)}#ol li:first-child{border:0}#ol li.mut{padding:12px}#ol button{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px;border:0;border-radius:0;background:none;color:inherit;font:inherit;cursor:pointer}#ol button:hover{background:rgba(127,127,127,.12)}#ol span{overflow:hidden;text-overflow:ellipsis;word-break:break-word}#ol small{white-space:nowrap}
 </style></head><body>
 <main id="home" hidden>
 <h1 id="h1">Просмотр моделей Базис-Мебельщика</h1>
@@ -355,7 +354,15 @@ let AN=null,XS={mode:'all',mat:'',sel:new Set(),o:{edge:1,holes:1,grooves:1}},XB
 const selParts=()=>!AN?[]:XS.mode==='mat'?AN.parts.filter(p=>p.mat===XS.mat):XS.mode==='sel'?AN.parts.filter(p=>XS.sel.has(p.id)):AN.parts;
 const uniqParts=l=>{const s={};return l.filter(p=>{const k=qkey(p);return s[k]?0:(s[k]=1)})};
 const safe=s=>String(s||'модель').replace(/[\\/:*?"<>|]+/g,' ').trim();
-async function saveFile(name,data){const d=await cap('downloads');if(!d){flash('Сохранение файлов в этом окне недоступно');return}
+function browserSave(name,data){
+ try{
+  const type=/\.pdf$/i.test(name)?'application/pdf':/\.xlsx$/i.test(name)?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':/\.csv$/i.test(name)?'text/csv;charset=utf-8':'application/octet-stream';
+  const blob=data instanceof Blob?data:new Blob([data],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=name;a.style.display='none';document.body.append(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},30000);
+  flash('Файл готов: '+name+(inTelegram()?'. Если он не скачался, откройте просмотр в браузере (меню ⋮ → «Открыть в браузере»)':''))
+ }catch(e){flash('Не удалось сохранить: '+(e.message||e))}}
+async function saveFile(name,data){const d=await cap('downloads');if(!d){browserSave(name,data);return}
  try{await d.save({filename:name,data});flash('Файл готов: '+name)}catch(e){if(e.code!=='declined')flash('Не удалось сохранить: '+(e.message||e.code))}}
 const blk=p=>p.tp&&(p.tp.a||p.tp.n)||'';
 function xrows(){const sp=selParts(),u=uniqParts(sp),q=qtys({parts:sp}),o=XS.o,R=[];
@@ -368,7 +375,7 @@ function xrows(){const sp=selParts(),u=uniqParts(sp),q=qtys({parts:sp}),o=XS.o,R
  if(o.grooves){const G=[['Блок','Поз.','Деталь','Кол-во деталей','Паз','Грань','Ширина, мм','Глубина, мм','Начало X','Начало Y','Конец X','Конец Y']];
   u.forEach(p=>p.grooves.forEach(g=>{const a=g.path[0],b=g.path[g.path.length-1];G.push([blk(p),p.pos,p.name,q[qkey(p)],g.sign,hfaceF(g,pframe(p)),+g.w.toFixed(1),+g.d.toFixed(1),...pframe(p).uv(a[0],a[1]).map(v=>+v.toFixed(1)),...pframe(p).uv(b[0],b[1]).map(v=>+v.toFixed(1))])}));R.push(['Пазы',G])}
  if(o.edge)R.push(['Типы кромки',[['№','Кромка'],...AN.etypes.map((e,i)=>[i+1,e])]]);return R}
-const loadX=()=>window.XLSX?Promise.resolve(window.XLSX):new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=()=>ok(window.XLSX);s.onerror=()=>no(Error('библиотека Excel не загрузилась'));document.head.append(s)});
+const loadX=()=>window.XLSX?Promise.resolve(window.XLSX):new Promise((ok,no)=>{const add=(src,fail)=>{const s=document.createElement('script');s.src=src;s.onload=()=>ok(window.XLSX);s.onerror=fail;document.head.append(s)};add('xlsx.full.min.js',()=>add('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',()=>no(Error('библиотека Excel не загрузилась'))))});
 async function expXlsx(){const R=xrows();let X=null;try{X=await loadX()}catch(e){}
  if(X){const wb=X.utils.book_new();R.forEach(([n,a])=>{const ws=X.utils.aoa_to_sheet(a);ws['!cols']=a[0].map((_,i)=>({wch:Math.min(40,Math.max(8,...a.map(r=>String(r[i]==null?'':r[i]).length+2)))}));X.utils.book_append_sheet(wb,ws,n)});
   await saveFile(safe(AN.title)+' — спецификация.xlsx',new Blob([X.write(wb,{type:'array',bookType:'xlsx'})],{type:'application/octet-stream'}));return}
@@ -630,15 +637,12 @@ async function show(buf,back,name,id){
  try{const doc=await parse(buf);init();mid=id||null;const t=doc.title||(name||'').replace(/\.[^.]+$/,'')||'Модель';$('#ttl').textContent=t;document.title=t;
   build(doc);try{AN=analyze(doc);AN.title=t;XS.sel.clear();XS.mode='all'}catch(e){AN=null}$('#msg').textContent=P.length?'':'В файле не нашлось деталей для показа.';subComments()}
  catch(e){$('#app').hidden=!0;home(e.message)}}
-async function openId(id){try{const r=await fetch('/_blob/'+id);if(!r.ok)throw Error('Модель не найдена: возможно, её удалил владелец.');
- let t=await r.text(),i=t.indexOf('\n'),nm='';if(i>0&&i<600){nm=decodeURIComponent(t.slice(0,i));t=t.slice(i+1)}
- await show(unb64(t),canBack,nm,id)}catch(e){home(e.message)}}
 async function localFile(f){if(f){canBack=!0;await show(await f.arrayBuffer(),!0,f.name,null)}}
 $('#f').onchange=e=>localFile(e.target.files[0]);
 addEventListener('dragover',e=>e.preventDefault());addEventListener('drop',e=>{e.preventDefault();localFile(e.dataTransfer.files[0])});
 
 const meter=()=>assets.list().then(r=>{$('#use').textContent='Занято '+fmt(r.usage.bytes)+' из '+fmt(r.usage.maxBytes)},()=>{});
-function home(err){closePop();$('#app').hidden=!0;$('#home').hidden=!1;$('#err').textContent=err||'';
+function home(err){closePop();$('#app').hidden=!0;$('#home').hidden=!1;$('#err').textContent=err||'';renderOrder();
  if(!(assets&&db&&canEdit))return;$('#mgr').hidden=!1;if(unsub)return;
  unsub=db.collection('models').orderBy('ts','desc').onSnapshot(s=>{const u=$('#ml');u.textContent='';meter();
   if(s.empty)u.append(el('li','mut','Пока нет моделей. Загрузите первую.'));
@@ -665,24 +669,46 @@ const inTelegram=()=>/tgWebApp/.test(location.hash)||!!window.TelegramWebviewPro
 const waitSDK=async()=>{if(!inTelegram())return;for(let i=0;i<30&&!TGW();i++)await new Promise(r=>setTimeout(r,50))};
 const startParam=()=>{let s='';try{s=TGW()&&TGW().initDataUnsafe&&TGW().initDataUnsafe.start_param||''}catch(e){}
  if(!s){const m=/[#&?]tgWebAppStartParam=([^&]+)/.exec(location.hash+location.search);if(m)try{s=decodeURIComponent(m[1])}catch(e){}}return s};
-const OID=/^[0-9a-f]{16}$/;let ORDER=null;
-async function wfetch(path,manifest){const w=((window.BAZIS||{}).worker||'').replace(/\/+$/,'');
+const OID=/^[0-9a-f]{16}$/;
+let ORDER=null;
+async function wfetch(path,manifest){
+ const w=((window.BAZIS||{}).worker||'').replace(/\/+$/,'');
  if(!w||/ВАШ|YOUR/i.test(w))throw Error('В файле config.js не указан адрес Worker.');
  let r;try{r=await fetch(w+path)}catch(e){throw Error('Не удалось связаться с сервером моделей. Проверьте интернет и повторите.')}
  if(!r.ok){let m='';try{m=(await r.json()).error||''}catch(e){}
   if(r.status===404&&manifest)throw Error('Просмотр не найден: ссылка неверная или его удалили.');
-  throw Error((m||'Сервер моделей ответил ошибкой '+r.status)+'.')}return r}
-function renderOrder(){const ol=$('#ol');ol.textContent='';$('#h1').textContent=ORDER?ORDER.title:'Просмотр моделей Базис-Мебельщика';
- $('#drop').hidden=!!ORDER;$('#intro').hidden=!!ORDER;ol.hidden=!ORDER;if(!ORDER)return;
- if(!ORDER.files.length){ol.append(el('li','mut','В заказе нет файлов моделей.'));return}
- ORDER.files.forEach((f,i)=>{const li=el('li'),b=el('button'),name=el('span','',f.n),size=el('small','mut',f.z?(f.z>=1e6?(f.z/1e6).toFixed(1)+' МБ':Math.max(1,Math.round(f.z/1e3))+' КБ'):'');b.append(name,size);b.onclick=()=>openFile(i);li.append(b);ol.append(li)})}
-async function openFile(i){const f=ORDER.files[i];canBack=ORDER.files.length>1;$('#cm').hidden=!0;$('#home').hidden=!0;$('#app').hidden=!1;$('#back').hidden=!canBack;$('#ttl').textContent=ORDER.title;$('#msg').textContent='Загружаю модель…';
- try{const r=await wfetch('/o/'+ORDER.id+'/'+i);await show(await r.arrayBuffer(),canBack,f.n.split('/').pop(),null)}catch(e){home(e.message)}}
-(async()=>{usr=await cap('user');assets=await cap('assets');db=await cap('db');
- try{canEdit=!!(usr&&await usr.canEdit());uid=usr?await usr.id():null}catch(e){}
- canBack=canEdit&&!!assets&&!!db;await waitSDK();try{const w=TGW();if(w){w.ready();w.expand()}}catch(e){}
- const q=new URLSearchParams(location.search),o=q.get('o')||startParam();
- if(o){if(!OID.test(o)){home('Некорректная ссылка на просмотр.');return}$('#app').hidden=!1;$('#msg').textContent='Загружаю…';
-  try{const m=await(await wfetch('/o/'+o,!0)).json();ORDER={id:o,title:m.title||'Модель',files:m.files||[]};if(ORDER.files.length===1){canBack=!1;$('#cm').hidden=!0;await openFile(0)}else home()}catch(e){home(e.message)}return}
- const h=location.hash.slice(1);if(/^[0-9a-f]{32}$/.test(h)){ $('#app').hidden=!1;$('#msg').textContent='Загружаю модель…';openId(h)}else home()})();
+  throw Error((m||'Сервер моделей ответил ошибкой '+r.status)+'.')}
+ return r}
+function renderOrder(){
+ const ol=$('#ol');ol.textContent='';
+ $('#h1').textContent=ORDER?ORDER.title:'Просмотр моделей Базис-Мебельщика';
+ $('#drop').hidden=!!ORDER;$('#intro').hidden=!!ORDER;ol.hidden=!ORDER;
+ if(!ORDER)return;
+ document.title=ORDER.title;
+ if(!ORDER.files.length){ol.append(el('li','mut','В этом заказе нет файлов моделей.'));return}
+ ORDER.files.forEach((f,i)=>{const li=el('li'),bt=el('button','');
+  bt.append(el('span','',f.n),el('small','mut',f.z?(f.z>=1e6?(f.z/1e6).toFixed(1)+' МБ':Math.max(1,Math.round(f.z/1e3))+' КБ'):''));
+  bt.onclick=()=>{canBack=!0;openFile(i)};li.append(bt);ol.append(li)})}
+async function openFile(i){
+ const f=ORDER.files[i];
+ $('#home').hidden=!0;$('#app').hidden=!1;$('#back').hidden=!canBack;$('#ttl').textContent=ORDER.title;$('#msg').textContent='Загружаю модель…';
+ try{const r=await wfetch('/o/'+ORDER.id+'/'+i);await show(await r.arrayBuffer(),canBack,f.n.split('/').pop(),null)}
+ catch(e){home(e.message)}}
+(async()=>{
+ $('#cm').hidden=!0;
+ await waitSDK();
+ try{const w=TGW();if(w){w.ready();w.expand()}}catch(e){}
+ const q=new URLSearchParams(location.search);let o=q.get('o'),mk=q.get('m');
+ if(!o){const sp=startParam(),mm=/^([0-9a-f]{16})(?:[_-]([0-9a-f]{8}))?$/.exec(sp);if(mm){o=mm[1];if(mm[2])mk=mm[2]}else o=sp}
+ if(!o){home();return}
+ if(!OID.test(o)){home('Некорректная ссылка на просмотр.');return}
+ $('#app').hidden=!1;$('#msg').textContent='Загружаю…';
+ try{
+  const m=await(await wfetch('/o/'+o,!0)).json();
+  ORDER={id:o,title:m.title||'Модель',files:m.files||[]};
+  const n=ORDER.files.length,k=mk?ORDER.files.findIndex(f=>f.k===mk):-1;
+  if(k>=0){canBack=n>1;await openFile(k)}                                // ссылка на конкретную модель заказа
+  else if(n===1){canBack=!1;await openFile(0)}
+  else home(mk?'Этой модели больше нет в заказе. Выберите из списка.':'')
+ }catch(e){home(e.message)}})();
 </script></body></html>
